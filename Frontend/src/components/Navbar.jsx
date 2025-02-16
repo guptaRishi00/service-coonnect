@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { IoIosArrowRoundForward } from "react-icons/io";
 import { MdArrowOutward } from "react-icons/md";
+import { LuBell } from "react-icons/lu";
 
 import logo from "../assets/logo1.png";
 import { fetchUser } from "../features/auth/UserAuthSlice";
@@ -80,7 +81,10 @@ function Navbar() {
 
         {/* user and profile part */}
         {user && (
-          <div className="">
+          <div className="flex items-center gap-5">
+            <span className="cursor-pointer text-gray-400">
+              <LuBell size={23} />
+            </span>
             <div className="flex items-center gap-3 cursor-pointer">
               <img
                 src="https://images.unsplash.com/photo-1738369350430-87d667611998?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDE0fHRvd0paRnNrcEdnfHxlbnwwfHx8fHw%3D"
