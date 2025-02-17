@@ -101,7 +101,7 @@ function BodyText() {
         viewport={{ once: true }}
         className="relative z-10"
       >
-        <img src={man} alt="Person Illustration" className="w-[495px]" />
+        <img src={man} alt="Person Illustration" className="w-[490px]" />
       </motion.div>
     </div>
   );

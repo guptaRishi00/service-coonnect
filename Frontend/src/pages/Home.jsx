@@ -11,11 +11,13 @@ function Home() {
     <div className="">
       <Navbar />
       <div className="flex flex-col items-center justify-center w-full">
-        <BodyText />
-        <div className="absolute -bottom-[170px] w-full">
-          <ServiceCard />
+        <div className="flex relative  flex-col items-center justify-center w-full">
+          <BodyText />
+          <Services />
+          <div className="absolute top-[36%] z-10 w-full">
+            <ServiceCard />
+          </div>
         </div>
-        <Services />
         <Whyus />
         <Appointment />
       </div>
