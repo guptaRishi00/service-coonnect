@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const userController = require("../controllers/user.controller");
 const { body } = require("express-validator");
+const userController = require("../controllers/user.controller");
 const { userAuthMiddleWare } = require("../middleware/userAuthMiddleWare");
+const { upload } = require("../middleware/multer.middleware");
 
 router.post(
   "/register",
@@ -33,5 +34,19 @@ router.post(
 );
 
 router.get("/profile", userAuthMiddleWare, userController.userProfile);
+
+router.post(
+  "/postwork",
+  userAuthMiddleWare,
+  upload.single("picture"),
+  userController.postWork
+);
+
+router.patch(
+  "/updateprofile",
+  userAuthMiddleWare,
+  upload.single("profilepicture"),
+  userController.updateProfile
+);
 
 module.exports = router;

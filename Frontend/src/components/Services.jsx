@@ -14,6 +14,7 @@ function Services() {
       description:
         "Resolving leaks, pipe repairs, and faucet installations with precision and efficiency.",
       icon: GiWaterSplash,
+      color: "#4CC9F0",
     },
     {
       id: 2,
@@ -21,6 +22,7 @@ function Services() {
       description:
         "Transforming spaces with expert craftsmanship and innovative design for stunning home makeovers.",
       icon: FaTools,
+      color: "#F72585",
     },
     {
       id: 3,
@@ -28,6 +30,7 @@ function Services() {
       description:
         "Elevating interiors and exteriors with flawless finishes and a spectrum of vibrant colors.",
       icon: FaBrush,
+      color: "#7209B7",
     },
     {
       id: 4,
@@ -35,6 +38,7 @@ function Services() {
       description:
         "Ensuring safety and functionality through skilled electrical installations and troubleshooting services.",
       icon: IoFlash,
+      color: "#FFD60A",
     },
     {
       id: 5,
@@ -42,6 +46,7 @@ function Services() {
       description:
         "Crafting custom solutions and precise installations for functional and aesthetic woodworking projects.",
       icon: IoMdCube,
+      color: "#FF9E00",
     },
     {
       id: 6,
@@ -49,58 +54,77 @@ function Services() {
       description:
         "Protecting homes with professional roofing solutions, repairs, and maintenance for lasting durability.",
       icon: MdHome,
+      color: "#00B4D8",
     },
   ];
 
   return (
-    <div className="w-full bg-[#09101c] pt-28">
-      <div className="w-full flex flex-col justify-center items-center py-20 gap-10">
-        {/* Topmost */}
-        <motion.p
+    <div className="w-full bg-gradient-to-b from-[#09101c] to-[#111827] pt-16 md:pt-28">
+      <div className=" mx-auto flex flex-col justify-center items-center py-12 md:py-20 gap-8 md:gap-12 px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           viewport={{ once: true }}
-          className="bg-[#232C39] rounded-full px-5 py-2 text-white font-medium"
+          className="flex flex-col items-center gap-4"
         >
-          Services
-        </motion.p>
-
-        {/* Middle */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
-          viewport={{ once: true }}
-        >
-          <h1 className="flex flex-col items-center text-6xl text-white">
+          <span className="bg-gradient-to-r from-[#232C39] to-[#2A3441] rounded-full px-6 py-2 text-white font-medium text-sm md:text-base shadow-lg">
+            Our Services
+          </span>
+          <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl text-white font-bold text-center leading-tight">
             Explore our comprehensive range
-            <span className="">of professional services.</span>
+            <span className="block mt-2 bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
+              of professional services.
+            </span>
           </h1>
         </motion.div>
 
-        {/* Bottom */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-[60px] mt-10">
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 w-full mt-8">
           {services.map((service, index) => (
             <motion.div
               key={service.id}
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{
-                duration: 0.8,
+                duration: 0.5,
                 ease: "easeOut",
-                delay: 0.3 + index * 0.3, // Increased delay for each card
+                delay: 0.2 + index * 0.1,
               }}
               viewport={{ once: true }}
-              className="py-10 px-20 text-white flex flex-col items-center "
+              className="group relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#1C1F2A] to-[#151821] p-6 lg:p-8"
             >
-              <div className="text-3xl">
-                <service.icon />
-              </div>
-              <h3 className="text-xl font-semibold mt-3">{service.title}</h3>
-              <p className="mt-2 text-gray-300 text-center text-sm font-bold">
-                {service.description}
-              </p>
+              <motion.div
+                initial={{ scale: 1 }}
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.3 }}
+                className="relative z-10 flex flex-col items-center text-center"
+              >
+                <div
+                  className="text-4xl md:text-5xl mb-4 transform transition-transform duration-300 group-hover:scale-110"
+                  style={{ color: service.color }}
+                >
+                  <service.icon />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
+                  {service.title}
+                </h3>
+                <p className="text-gray-300 text-sm md:text-base leading-relaxed">
+                  {service.description}
+                </p>
+              </motion.div>
+
+              {/* Gradient background effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.1)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -translate-x-full group-hover:translate-x-full" />
+
+              {/* Corner accent */}
+              <div
+                className="absolute -top-1 -right-1 w-16 h-16 opacity-20"
+                style={{
+                  background: `radial-gradient(circle at 0 0, transparent 0%, ${service.color} 100%)`,
+                }}
+              />
             </motion.div>
           ))}
         </div>

@@ -1,6 +1,8 @@
 const userModel = require("../models/user.model");
+const workPostModel = require("../models/workpost.model");
 const userService = require("../services/user.service");
 const { validationResult } = require("express-validator");
+const { uploadOnCloudinary } = require("../utils/cloudinary");
 
 module.exports.userRegister = async (req, res) => {
   const errors = validationResult(req);
@@ -9,7 +11,7 @@ module.exports.userRegister = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { fullname, email, password, phone, address, image } = req.body;
+  const { fullname, email, password, phone, address } = req.body;
 
   const isUserAlreadyExists = await userModel.findOne({ email });
 
@@ -84,5 +86,97 @@ module.exports.userProfile = async (req, res) => {
     res.status(200).json({ user });
   } catch (error) {
     res.status(401).json({ error: error.message });
+  }
+};
+
+module.exports.updateProfile = async (req, res) => {
+  try {
+    const { fullname, phone, address } = req.body;
+    const user = req.user;
+
+    // Check if user exists in the request (authentication must be successful)
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized, user not found" });
+    }
+
+    // Handle profile image upload
+    let profileImage = null;
+    if (req.file) {
+      const uploadResult = await uploadOnCloudinary(req.file.path);
+      if (!uploadResult) {
+        return res.status(500).json({ message: "Image upload failed" });
+      }
+      profileImage = uploadResult.secure_url;
+    }
+
+    // Update user profile
+    const updatedUser = await userModel.findOneAndUpdate(
+      { _id: user._id },
+      {
+        $set: {
+          image: profileImage,
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res
+        .status(404)
+        .json({ message: "User not found or update failed" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Profile updated successfully", user: updatedUser });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+module.exports.postWork = async (req, res) => {
+  const { title, description, serviceType, location, budget } = req.body;
+
+  const user = req.user;
+
+  if (user.role != "user") {
+    return res.status(403).json({ message: "you are not a valid user" });
+  }
+
+  const workLocalPath = req.file?.path;
+
+  if (!workLocalPath) {
+    return res.status(400).json({ error: "Work path is required" });
+  }
+
+  const workPicture = await uploadOnCloudinary(workLocalPath);
+
+  if (!workPicture) {
+    return res
+      .status(400)
+      .json({ error: "Failed to upload work to Cloudinary" });
+  }
+
+  try {
+    const userid = req.user._id;
+
+    const work = await workPostModel.create({
+      title,
+      description,
+      serviceType,
+      location,
+      budget,
+      user: userid,
+
+      picture: workPicture.secure_url,
+    });
+
+    await work.save();
+    res.status(201).json(work);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
   }
 };
