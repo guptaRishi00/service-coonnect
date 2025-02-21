@@ -4,7 +4,7 @@ import { MdArrowOutward } from "react-icons/md";
 import { BiSolidQuoteLeft } from "react-icons/bi";
 import { MdOutlineInfo } from "react-icons/md";
 
-import * as motion from "motion/react-client";
+import { Link } from "react-router-dom";
 
 function Drawer({ user }) {
   return (
@@ -57,9 +57,26 @@ function Drawer({ user }) {
           <p className="text-gray-500 text-sm font-medium ">About</p>
         </div>
 
-        <button className="w-full rounded-md mt-5 cursor-pointer p-2 bg-black text-white">
-          Logout
-        </button>
+        {user ? (
+          <>
+            <button className="w-full rounded-md mt-5 cursor-pointer p-2 bg-black text-white">
+              Logout
+            </button>
+          </>
+        ) : (
+          <div className="flex flex-col items-center w-full gap-3">
+            <Link to={"user-login"}>
+              <button className="rounded-md cursor-pointer p-2 bg-white border border-black text-black ">
+                Login
+              </button>
+            </Link>
+            <Link to={"user-register"}>
+              <button className="rounded-md cursor-pointer p-2 bg-black text-white">
+                Sign up
+              </button>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
