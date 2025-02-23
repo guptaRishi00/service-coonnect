@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import man from "../assets/imageOne.png";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 function BodyText() {
   return (
@@ -81,12 +82,14 @@ function BodyText() {
           viewport={{ once: true }}
           className="flex items-center gap-4 flex-col sm:flex-row w-full sm:w-auto"
         >
-          <button className="w-full sm:w-auto px-4 md:px-5 py-3 md:py-4 bg-[#FE8058] font-medium text-white rounded-lg flex items-center justify-center group">
-            Book Now
-            <span className="ml-2 group-hover:translate-x-1 transition-transform">
-              <MdOutlineKeyboardArrowRight size={25} />
-            </span>
-          </button>
+          <Link to={"/book-now"} className="w-full lg:w-auto">
+            <button className="w-full sm:w-auto px-4 md:px-5 py-3 md:py-4 bg-[#FE8058] font-medium text-white rounded-lg flex items-center justify-center group">
+              Book Now
+              <span className="ml-2 group-hover:translate-x-1 transition-transform">
+                <MdOutlineKeyboardArrowRight size={25} />
+              </span>
+            </button>
+          </Link>
           <button className="w-full sm:w-auto px-4 md:px-5 py-3 md:py-4 border-[#5e5e5e] font-medium border rounded-lg bg-white hover:bg-gray-50 transition-colors">
             Read More
           </button>

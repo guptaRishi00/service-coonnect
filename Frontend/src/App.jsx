@@ -6,16 +6,26 @@ import UserLogin from "./pages/user/UserLogin";
 import WorkerRegister from "./pages/worker/WorkerRegister";
 import WorkerLogin from "./pages/worker/WorkerLogin";
 import Home from "./pages/Home";
+import UserProfile from "./pages/user/UserProfile";
+import BookNow from "./pages/BookNow";
+import Navbar from "./components/Navbar";
+import PostWork from "./pages/user/PostWork";
+import YourWorks from "./pages/user/YourWorks";
 
 function App() {
   return (
     <>
+      <Navbar />
       <Routes>
+        <Route path="/user-yourwork" element={<YourWorks />} />
+        <Route path="/user-profile" element={<UserProfile />} />
         <Route path="/user-register" element={<UserRegister />} />
         <Route path="/user-login" element={<UserLogin />} />
         <Route path="/worker-register" element={<WorkerRegister />} />
         <Route path="/worker-login" element={<WorkerLogin />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/book-now" element={<BookNow />} />
+        <Route path="/post-work" element={<PostWork />} />
         <Route path="*" element={<Home />} />
       </Routes>
     </>

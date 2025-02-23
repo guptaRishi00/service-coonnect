@@ -9,8 +9,7 @@ module.exports.registerWorker = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { fullname, email, password, phone, address, profession, image } =
-    req.body;
+  const { fullname, email, password, phone, address, profession } = req.body;
 
   const isWorkerAlreadyExists = await userModel.findOne({ email });
 
@@ -20,21 +19,21 @@ module.exports.registerWorker = async (req, res) => {
 
   const hashPassword = await userModel.hashPassword(password);
 
-  const worker = await workerService.createWorker({
-    firstname: fullname.firstname,
-    lastname: fullname.lastname,
+  const worker = await workerService.createWorker(
+    fullname.firstname,
+    fullname.lastname,
     email,
-    password: hashPassword,
+    hashPassword,
     phone,
-    role: "worker",
-    street: address.street,
-    city: address.city,
-    state: address.state,
-    zipcode: address.zipcode,
-    country: address.country,
+    "worker",
+    address.street,
+    address.city,
+    address.state,
+    address.zipcode,
+    address.country,
     profession,
-    image,
-  });
+    "" // Image is empty for now
+  );
 
   const token = await worker.generateAuthToken();
 

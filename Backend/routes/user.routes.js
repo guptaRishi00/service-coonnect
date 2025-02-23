@@ -35,6 +35,8 @@ router.post(
 
 router.get("/profile", userAuthMiddleWare, userController.userProfile);
 
+router.get("/my-works", userAuthMiddleWare, userController.myWorks);
+
 router.post(
   "/postwork",
   userAuthMiddleWare,

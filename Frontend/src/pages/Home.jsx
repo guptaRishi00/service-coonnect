@@ -1,5 +1,4 @@
 import React from "react";
-import Navbar from "../components/Navbar";
 import BodyText from "../components/BodyText";
 import Services from "../components/Services";
 import ServiceCard from "../components/ServiceCard";
@@ -9,7 +8,6 @@ import Appointment from "../components/Appointment";
 function Home() {
   return (
     <div className="">
-      <Navbar />
       <div className="flex flex-col items-center justify-center w-full">
         <div className="flex relative flex-col items-center justify-center w-full">
           <BodyText />

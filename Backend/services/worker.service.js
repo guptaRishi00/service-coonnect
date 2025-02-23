@@ -15,7 +15,7 @@ module.exports.createWorker = async (
   profession,
   image
 ) => {
-  if (!firstname || !lastname || !email || !password || !role || !profession) {
+  if (!firstname || !lastname || !email || !password || !profession) {
     throw new Error("All fields are required");
   }
 

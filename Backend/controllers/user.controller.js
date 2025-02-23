@@ -180,3 +180,23 @@ module.exports.postWork = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+module.exports.myWorks = async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    return res.status(400).json({ message: "Invalid User" });
+  }
+
+  try {
+    const work = await workPostModel.find({ user: user._id });
+
+    if (!work) {
+      return res.status(404).json({ message: "No resource found" });
+    }
+
+    res.status(200).json({ work });
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+};
