@@ -27,7 +27,12 @@ function UserLogin() {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/user/login`,
-        user
+        user,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
       if (response.status === 200) {
