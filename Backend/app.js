@@ -12,12 +12,7 @@ const userRoute = require("./routes/user.routes");
 const workerRoute = require("./routes/worker.routes");
 
 app.use(
-  cors({
-    origin: "https://service-coonnect.vercel.app", // Allow only your frontend
-    credentials: true, // Allow cookies if needed
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allow headers
-  })
+  cors({ origin: "https://service-coonnect.vercel.app", credentials: true })
 );
 app.options("*", cors());
 app.use(express.json());

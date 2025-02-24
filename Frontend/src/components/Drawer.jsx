@@ -23,7 +23,7 @@ function Drawer({ user }) {
     <div className="right-0 z-20 absolute bg-white shadow-lg h-svh w-1/2">
       <div className="flex flex-col items-start py-3 px-3 gap-3">
         {/* profile */}
-        {user ? (
+        {user?.user ? (
           <>
             <div className=" bg-[#eeeeee] w-full  rounded-md p-3">
               <div className="flex items-center gap-2 cursor-pointer">

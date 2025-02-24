@@ -24,11 +24,15 @@ const workPostSchema = new Schema({
   },
   user: {
     type: String,
-    ref: "Employer",
+    ref: "User",
   },
   picture: {
     type: String,
     required: true,
+  },
+  status: {
+    type: String,
+    enum: ["accept", "pending", "rejected"],
   },
   createdAt: {
     type: Date,

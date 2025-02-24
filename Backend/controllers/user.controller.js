@@ -170,7 +170,7 @@ module.exports.postWork = async (req, res) => {
       location,
       budget,
       user: userid,
-
+      status: "pending",
       picture: workPicture.secure_url,
     });
 

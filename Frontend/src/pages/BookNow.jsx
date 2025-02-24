@@ -130,7 +130,7 @@ const BookNow = () => {
       />
 
       {/* Content Container */}
-      <div className="relative px-4 md:px-8 py-8 max-w-7xl mx-auto">
+      <div className="relative px-4 md:px-8 py-8 max-w-[92rem] mx-auto">
         {/* Rest of the component structure remains the same, just updating background colors */}
 
         {/* Header section */}

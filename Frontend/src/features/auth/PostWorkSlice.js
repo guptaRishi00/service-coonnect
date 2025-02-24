@@ -76,7 +76,7 @@ const postWorkSlice = createSlice({
         state.work = null;
       })
       .addCase(postWork.fulfilled, (state, action) => {
-        state.work.push(action.payload);
+        state.work = action.payload;
       })
       .addCase(postWork.rejected, (state, action) => {
         state.error = action.payload;
