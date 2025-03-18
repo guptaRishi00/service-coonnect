@@ -11,6 +11,7 @@ import BookNow from "./pages/BookNow";
 import Navbar from "./components/Navbar";
 import PostWork from "./pages/user/PostWork";
 import YourWorks from "./pages/user/YourWorks";
+import SearchWork from "./pages/worker/SearchWork";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/user-login" element={<UserLogin />} />
         <Route path="/worker-register" element={<WorkerRegister />} />
         <Route path="/worker-login" element={<WorkerLogin />} />
+        <Route path="/worker-searchwork" element={<SearchWork />} />
         <Route path="/home" element={<Home />} />
         <Route path="/book-now" element={<BookNow />} />
         <Route path="/post-work" element={<PostWork />} />

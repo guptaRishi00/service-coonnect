@@ -3,6 +3,7 @@ const router = express.Router();
 const { body } = require("express-validator");
 
 const workerController = require("../controllers/worker.controller");
+const { userAuthMiddleWare } = require("../middleware/userAuthMiddleWare");
 
 router.post(
   "/register",
@@ -31,5 +32,7 @@ router.post(
   ],
   workerController.workerLogin
 );
+
+router.get("/searchworks", workerController.searchWorks);
 
 module.exports = router;

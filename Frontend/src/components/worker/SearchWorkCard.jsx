@@ -1,7 +1,36 @@
-import React from "react";
-import { FaCircle } from "react-icons/fa6";
+import axios from "axios";
+import React, { useState } from "react";
+import ApplyButton from "./ApplyButton";
 
-function YourWorkCard({ work }) {
+function SearchWorkCard({ work }) {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("You are not logged in!");
+    return;
+  }
+  const [status, setStatus] = useState(work.status);
+
+  const handleStatusChange = async (newStatus) => {
+    try {
+      const response = await axios.patch(
+        `${import.meta.env.VITE_BASE_URL}/worker/acceptorreject/${work._id}`,
+        { status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Attach token
+          },
+        }
+      );
+
+      setStatus(newStatus);
+      console.log("Work status updated:", response.data);
+    } catch (error) {
+      console.error("Error updating work status:", error);
+      alert("Failed to update work status");
+    }
+  };
+
   return (
     <div className="border rounded-lg p-4">
       <img
@@ -35,31 +64,13 @@ function YourWorkCard({ work }) {
         </div>
       </div>
 
-      {/* Price and Add to Cart */}
+      {/* Price and Status Update Buttons */}
       <div className="flex justify-between items-center">
         <div className="text-lg font-medium">Budget: ₹{work.budget}</div>
-        {work.status && (
-          <button
-            className={`border rounded-lg px-4 py-2 flex items-center gap-2 bg-gray-100
-     
-      
-      `}
-          >
-            <span
-              className={` ${
-                work.status === "pending" ? "text-yellow-400 " : ""
-              } ${work.status === "accepted" ? "text-green-400 " : ""} ${
-                work.status === "rejected" ? "text-red-400 " : ""
-              }`}
-            >
-              <FaCircle size={8} />
-            </span>
-            <span className="text-blue-500">{work.status}</span>
-          </button>
-        )}
+        <ApplyButton work={work._id} />
       </div>
     </div>
   );
 }
 
-export default YourWorkCard;
+export default SearchWorkCard;

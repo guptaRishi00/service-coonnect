@@ -72,7 +72,7 @@ function Navbar() {
           </div>
 
           {user?.user?.role === "worker" ? (
-            <NavLink to="/worker-register">Search work</NavLink>
+            <NavLink to="/worker-searchwork">Search work</NavLink>
           ) : user?.user?.role === "user" ? (
             <NavLink to="/post-work">Something Broken ?</NavLink>
           ) : (

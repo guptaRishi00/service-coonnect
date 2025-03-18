@@ -1,31 +1,36 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchWork } from "../../features/auth/PostWorkSlice";
-import YourWorkCard from "../../components/user/YourWorkCard";
-import { FaCalendarAlt, FaClock, FaChevronDown } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { FaCalendarAlt, FaClock, FaChevronDown } from "react-icons/fa";
 
-function YourWorks() {
-  const { work } = useSelector((state) => state.userWork);
-  const dispatch = useDispatch();
+import axios from "axios";
+import SearchWorkCard from "../../components/worker/SearchWorkCard";
+
+function SearchWork() {
+  const [work, setWork] = useState([]);
   const [activeCategory, setActiveCategory] = useState("Clothes");
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState("All Day");
 
   useEffect(() => {
-    dispatch(fetchWork());
-  }, [dispatch]);
+    const fetchWork = async () => {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/worker/searchworks`
+      );
+      setWork(response.data);
+    };
+    fetchWork();
+  }, []);
 
   const timeOptions = ["All Day", "Morning", "Afternoon", "Evening", "Night"];
 
   return (
-    <div className="mx-auto px-4 sm:px-8 lg:px-14 py-4 sm:py-6">
+    <div className="mx-auto px-4 sm:px-8 lg:px-14 py-6 sm:py-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-4 sm:mb-6">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium">
-          Your Works
+          All Works
         </h1>
       </div>
 
@@ -118,7 +123,7 @@ function YourWorks() {
         ) : (
           work.work.map((workItem, index) => (
             <div key={index}>
-              <YourWorkCard work={workItem} />
+              <SearchWorkCard work={workItem} />
             </div>
           ))
         )}
@@ -127,4 +132,4 @@ function YourWorks() {
   );
 }
 
-export default YourWorks;
+export default SearchWork;

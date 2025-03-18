@@ -1,4 +1,6 @@
+const updatedWorkModel = require("../models/updatedWork.model");
 const userModel = require("../models/user.model");
+const workpostModel = require("../models/workpost.model");
 const workerService = require("../services/worker.service");
 const { validationResult } = require("express-validator");
 
@@ -64,4 +66,18 @@ module.exports.workerLogin = async (req, res) => {
   const token = await worker.generateAuthToken();
 
   res.status(200).json({ token, worker });
+};
+
+module.exports.searchWorks = async (req, res) => {
+  try {
+    const work = await workpostModel.find({});
+
+    if (!work) {
+      return res.status(404).json({ message: "No resource found" });
+    }
+
+    res.status(200).json({ work });
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
 };
