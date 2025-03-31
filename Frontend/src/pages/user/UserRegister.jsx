@@ -73,9 +73,9 @@ function UserRegister() {
     <div className="flex flex-col lg:flex-row justify-center min-h-screen bg-white">
       {/* Form Section */}
       <div className="p-10 flex flex-col justify-start items-start gap-8 lg:w-1/2 bg-white rounded-lg">
-        <Link to={"/"}>
+        {/* <Link to={"/"}>
           <img src={logo} alt="Logo" className="w-16" />
-        </Link>
+        </Link> */}
 
         <div className="flex flex-col gap-2">
           <h1 className="font-bold text-2xl lg:text-3xl">

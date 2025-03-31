@@ -7,17 +7,20 @@ import { fetchUser, loginSuccess } from "../../features/auth/UserAuthSlice";
 import { useDispatch } from "react-redux";
 import { FaGoogle } from "react-icons/fa";
 import logo from "../../assets/logo1.png";
-import globe from "../../assets/girl_side.jpg";
 
 function UserLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const submitHandler = async (e) => {
     e.preventDefault();
+
+    // Set loading state to true when login starts
+    setIsLoading(true);
 
     const user = {
       email: email,
@@ -49,6 +52,10 @@ function UserLogin() {
       setPassword("");
     } catch (error) {
       console.error("Error logging in", error);
+      // Optional: Add error handling, perhaps set an error state
+    } finally {
+      // Always set loading state back to false
+      setIsLoading(false);
     }
   };
 
@@ -56,9 +63,9 @@ function UserLogin() {
     <div className="flex flex-col lg:flex-row justify-center min-h-screen bg-white">
       {/* Form Section */}
       <div className="p-10 flex flex-col justify-start items-start gap-8 lg:w-1/2 bg-white">
-        <Link to={"/"}>
+        {/* <Link to={"/"}>
           <img src={logo} alt="Logo" className="w-16" />
-        </Link>
+        </Link> */}
 
         <div className="flex flex-col gap-2">
           <h1 className="font-bold text-2xl lg:text-3xl">
@@ -78,6 +85,7 @@ function UserLogin() {
               className="border border-gray-300 rounded-md px-4 py-3 outline-none focus:ring-2 focus:ring-[#FFBE98]"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
             />
           </div>
 
@@ -89,15 +97,42 @@ function UserLogin() {
               className="border border-gray-300 rounded-md px-4 py-3 outline-none focus:ring-2 focus:ring-[#FFBE98]"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
             />
           </div>
 
           {/* Login Button */}
           <button
-            className="rounded-md px-4 py-3 bg-[#FFBE98] font-medium text-gray-900 hover:bg-[#ffa474] transition"
+            className={`rounded-md px-4 py-3 font-medium text-gray-900 transition ${
+              isLoading
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-[#FFBE98] hover:bg-[#ffa474]"
+            }`}
             onClick={(e) => submitHandler(e)}
+            disabled={isLoading}
           >
-            Log in
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Logging in...
+              </div>
+            ) : (
+              "Log in"
+            )}
           </button>
 
           {/* Divider */}
@@ -108,7 +143,10 @@ function UserLogin() {
           </div>
 
           {/* Google Login */}
-          <button className="rounded-md px-4 py-3 border border-blue-500 flex items-center justify-center gap-4 font-medium text-blue-500 hover:bg-blue-100 transition">
+          <button
+            className="rounded-md px-4 py-3 border border-blue-500 flex items-center justify-center gap-4 font-medium text-blue-500 hover:bg-blue-100 transition"
+            disabled={isLoading}
+          >
             <FaGoogle />
             Log in with Google
           </button>

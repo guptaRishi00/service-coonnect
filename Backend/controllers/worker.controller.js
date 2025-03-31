@@ -1,7 +1,8 @@
-const updatedWorkModel = require("../models/updatedWork.model");
 const userModel = require("../models/user.model");
 const workpostModel = require("../models/workpost.model");
 const workerService = require("../services/worker.service");
+const WorkerApplication = require("../models/wokerApplication.model");
+
 const { validationResult } = require("express-validator");
 
 module.exports.registerWorker = async (req, res) => {
@@ -38,6 +39,8 @@ module.exports.registerWorker = async (req, res) => {
   );
 
   const token = await worker.generateAuthToken();
+
+  res.cookie("token", token);
 
   res.status(200).json({ token, worker });
 };
@@ -79,5 +82,39 @@ module.exports.searchWorks = async (req, res) => {
     res.status(200).json({ work });
   } catch (error) {
     res.status(404).json({ error: error.message });
+  }
+};
+
+module.exports.applyWork = async (req, res) => {
+  const user = req.user;
+
+  const { biddingPrice } = req.body;
+  const work_id = req.params.id;
+
+  if (!user) {
+    return res.status(403).json({ message: "Unathorized" });
+  }
+
+  if (user.role != "worker") {
+    return res.status(403).json({ message: "you are not a valid woker" });
+  }
+
+  try {
+    const work = await workpostModel.findOne({ _id: work_id });
+
+    if (!work) {
+      throw new Error("No Work Found");
+    }
+
+    const application = await WorkerApplication.create({
+      worker_id: user._id,
+      work_id: work_id,
+      user_id: work.user,
+      biddingPrice,
+    });
+
+    res.status(200).json({ data: application });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 };

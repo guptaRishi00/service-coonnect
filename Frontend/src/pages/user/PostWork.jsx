@@ -4,7 +4,7 @@ import { postWork } from "../../features/auth/PostWorkSlice"; // Import your Red
 import { useNavigate } from "react-router-dom";
 
 function PostWork() {
-  const dispatch = useDispatch(); // Added dispatch hook
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -17,6 +17,7 @@ function PostWork() {
   const [picture, setPicture] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const serviceTypes = [
     "Plumbing",
@@ -62,6 +63,9 @@ function PostWork() {
       return;
     }
 
+    // Set loading state to true
+    setIsLoading(true);
+
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
@@ -81,7 +85,9 @@ function PostWork() {
       }
     } catch (error) {
       console.error("Error creating work post:", error);
-      console.error("Error submitting work:", error);
+    } finally {
+      // Set loading state back to false
+      setIsLoading(false);
     }
   };
 
@@ -107,7 +113,7 @@ function PostWork() {
         </div>
 
         <form className="w-full flex flex-col gap-5">
-          {/* Previous form fields remain the same */}
+          {/* Title Input */}
           <div className="flex flex-col gap-2">
             <p className="text-md font-medium">Title*</p>
             <input
@@ -117,12 +123,14 @@ function PostWork() {
               value={formData.title}
               onChange={handleChange}
               placeholder="Enter work title"
+              disabled={isLoading}
             />
             {errors.title && (
               <p className="text-red-500 text-sm">{errors.title}</p>
             )}
           </div>
 
+          {/* Description Input */}
           <div className="flex flex-col gap-2">
             <p className="text-md font-medium">Description*</p>
             <textarea
@@ -131,12 +139,14 @@ function PostWork() {
               value={formData.description}
               onChange={handleChange}
               placeholder="Enter work description"
+              disabled={isLoading}
             />
             {errors.description && (
               <p className="text-red-500 text-sm">{errors.description}</p>
             )}
           </div>
 
+          {/* Service Type Input */}
           <div className="flex flex-col gap-2">
             <p className="text-md font-medium">Service Type*</p>
             <select
@@ -144,6 +154,7 @@ function PostWork() {
               className="border border-gray-300 rounded-md px-4 py-3 outline-none focus:ring-2 focus:ring-[#FFBE98] bg-white"
               value={formData.serviceType}
               onChange={handleChange}
+              disabled={isLoading}
             >
               <option value="">Select service type</option>
               {serviceTypes.map((type) => (
@@ -157,6 +168,7 @@ function PostWork() {
             )}
           </div>
 
+          {/* Location Input */}
           <div className="flex flex-col gap-2">
             <p className="text-md font-medium">Location</p>
             <input
@@ -166,9 +178,11 @@ function PostWork() {
               value={formData.location}
               onChange={handleChange}
               placeholder="Enter location (optional)"
+              disabled={isLoading}
             />
           </div>
 
+          {/* Budget Input */}
           <div className="flex flex-col gap-2">
             <p className="text-md font-medium">Budget</p>
             <input
@@ -178,16 +192,19 @@ function PostWork() {
               value={formData.budget}
               onChange={handleChange}
               placeholder="Enter budget (optional)"
+              disabled={isLoading}
             />
           </div>
 
-          {/* Updated Picture Input */}
+          {/* Picture Input */}
           <div className="flex flex-col gap-2">
             <p className="text-md font-medium">Picture*</p>
             <div className="flex flex-col items-center justify-center w-full">
               <label
                 htmlFor="picture-upload"
-                className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                className={`flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 {previewUrl ? (
                   <div className="w-full h-full flex items-center justify-center">
@@ -230,6 +247,7 @@ function PostWork() {
                   onChange={handleFileChange}
                   name="picture"
                   className="hidden"
+                  disabled={isLoading}
                 />
               </label>
             </div>
@@ -238,12 +256,39 @@ function PostWork() {
             )}
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
-            className="rounded-md px-4 py-3 bg-[#FFBE98] font-medium text-gray-900 hover:bg-[#ffa474] transition mt-4"
+            className={`rounded-md px-4 py-3 font-medium text-gray-900 transition mt-4 ${
+              isLoading
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-[#FFBE98] hover:bg-[#ffa474]"
+            }`}
             onClick={handleSubmit}
+            disabled={isLoading}
           >
-            Post Work
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Posting Work...
+              </div>
+            ) : (
+              "Post Work"
+            )}
           </button>
         </form>
 

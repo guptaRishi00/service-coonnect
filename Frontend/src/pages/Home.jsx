@@ -4,6 +4,8 @@ import Services from "../components/Services";
 import ServiceCard from "../components/ServiceCard";
 import Whyus from "../components/Whyus";
 import Appointment from "../components/Appointment";
+import ContactUs from "../components/ContactUs";
+import Footer from "../components/Footer";
 
 function Home() {
   return (
@@ -18,6 +20,8 @@ function Home() {
         </div>
         <Whyus />
         <Appointment />
+        <ContactUs />
+        <Footer />
       </div>
     </div>
   );

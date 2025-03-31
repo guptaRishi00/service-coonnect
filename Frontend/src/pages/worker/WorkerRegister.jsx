@@ -5,6 +5,8 @@ import sidemap from "../../assets/worker4.jpg";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { fetchUser, loginSuccess } from "../../features/auth/UserAuthSlice";
 
 function WorkerRegister() {
   const [firstname, setFirstname] = useState("");
@@ -18,6 +20,8 @@ function WorkerRegister() {
   const [zipcode, setZipcode] = useState("");
   const [country, setCountry] = useState("");
   const [servicetype, setServicetype] = useState("");
+
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
@@ -54,6 +58,9 @@ function WorkerRegister() {
         console.log("Worker Registered Successfully", data);
       }
 
+      dispatch(loginSuccess({ token: response.data.token }));
+      await dispatch(fetchUser());
+
       navigate("/home");
 
       setEmail("");
@@ -76,9 +83,9 @@ function WorkerRegister() {
     <div className="flex flex-col lg:flex-row justify-center min-h-screen bg-white">
       {/* Form Section */}
       <div className="p-10 flex flex-col justify-start items-start gap-8 lg:w-1/2 bg-white rounded-lg">
-        <Link to={"/"}>
+        {/* <Link to={"/"}>
           <img src={logo} alt="Logo" className="w-16" />
-        </Link>
+        </Link> */}
 
         <div className="flex flex-col gap-2">
           <h1 className="font-bold text-2xl lg:text-3xl">

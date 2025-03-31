@@ -1,8 +1,11 @@
 import axios from "axios";
 import React, { useState } from "react";
 import ApplyButton from "./ApplyButton";
+import ApplyInputButton from "./ApplyInputButton";
 
 function SearchWorkCard({ work }) {
+  const [apply, setApply] = useState(true);
+
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -65,9 +68,19 @@ function SearchWorkCard({ work }) {
       </div>
 
       {/* Price and Status Update Buttons */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center w-full ">
         <div className="text-lg font-medium">Budget: ₹{work.budget}</div>
-        <ApplyButton work={work._id} />
+        <div className="">
+          {apply ? (
+            <>
+              <ApplyButton setApply={setApply} />
+            </>
+          ) : (
+            <>
+              <ApplyInputButton work={work._id} />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

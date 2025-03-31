@@ -33,6 +33,12 @@ router.post(
   workerController.workerLogin
 );
 
+router.post(
+  "/workapplication/:id",
+  userAuthMiddleWare,
+  workerController.applyWork
+);
+
 router.get("/searchworks", workerController.searchWorks);
 
 module.exports = router;

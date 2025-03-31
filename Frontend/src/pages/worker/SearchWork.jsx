@@ -13,15 +13,22 @@ function SearchWork() {
   const [endDate, setEndDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState("All Day");
 
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
     const fetchWork = async () => {
       const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/worker/searchworks`
+        `${import.meta.env.VITE_BASE_URL}/worker/searchworks`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setWork(response.data);
     };
     fetchWork();
-  }, []);
+  }, [token]);
 
   const timeOptions = ["All Day", "Morning", "Afternoon", "Evening", "Night"];
 

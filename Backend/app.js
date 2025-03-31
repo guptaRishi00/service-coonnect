@@ -10,6 +10,8 @@ connectToDb();
 
 const userRoute = require("./routes/user.routes");
 const workerRoute = require("./routes/worker.routes");
+const adminRoute = require("./routes/admin.routes");
+const messageRoute = require("./routes/message.routes");
 
 app.use(cors({ origin: "*", credentials: true }));
 app.options("*", cors());
@@ -19,5 +21,7 @@ app.use(cookieParser());
 
 app.use("/serviceconnect/user", userRoute);
 app.use("/serviceconnect/worker", workerRoute);
+app.use("/serviceconnect/admin", adminRoute);
+app.use("/serviceconnect/message", messageRoute);
 
 module.exports = app;

@@ -51,4 +51,16 @@ router.patch(
   userController.updateProfile
 );
 
+router.get(
+  "/workRequestNotification",
+  userAuthMiddleWare,
+  userController.workRequestNotification
+);
+
+router.patch(
+  "/workAcceptOrReject/:cardid",
+  userAuthMiddleWare,
+  userController.acceptOrRejectApplication
+);
+
 module.exports = router;

@@ -1,8 +1,12 @@
 const userModel = require("../models/user.model");
 const workPostModel = require("../models/workpost.model");
 const userService = require("../services/user.service");
+const conversationModel = require("../models/conversation.model");
 const { validationResult } = require("express-validator");
 const { uploadOnCloudinary } = require("../utils/cloudinary");
+
+const mongoose = require("mongoose");
+const WorkerApplication = require("../models/wokerApplication.model");
 
 module.exports.userRegister = async (req, res) => {
   const errors = validationResult(req);
@@ -33,10 +37,10 @@ module.exports.userRegister = async (req, res) => {
     state: address.state,
     zipcode: address.zipcode,
     country: address.country,
-    image,
   });
 
   const token = await user.generateAuthToken();
+  res.cookie("token", token);
 
   res.status(200).json({ token, user });
 };
@@ -184,12 +188,16 @@ module.exports.postWork = async (req, res) => {
 module.exports.myWorks = async (req, res) => {
   const user = req.user;
 
+  const userid = user._id;
+
   if (!user) {
     return res.status(400).json({ message: "Invalid User" });
   }
 
   try {
-    const work = await workPostModel.find({ user: user._id });
+    const work = await workPostModel.find({
+      user: userid,
+    });
 
     if (!work) {
       return res.status(404).json({ message: "No resource found" });
@@ -198,5 +206,82 @@ module.exports.myWorks = async (req, res) => {
     res.status(200).json({ work });
   } catch (error) {
     res.status(404).json({ error: error.message });
+  }
+};
+
+module.exports.workRequestNotification = async (req, res) => {
+  const user = req.user;
+
+  if (user.role !== "user") {
+    return res.status(401).json({ error: "You are not a user" });
+  }
+
+  const userid = user._id;
+
+  try {
+    const notification = await WorkerApplication.find({ user_id: userid })
+      .populate("worker_id")
+      .populate("work_id");
+
+    if (!notification) {
+      throw new Error("Nothing Found");
+    }
+
+    res.status(200).json({ data: notification });
+  } catch (error) {
+    res.status(200).json({ errror: error.message });
+  }
+};
+
+module.exports.acceptOrRejectApplication = async (req, res) => {
+  const user = req.user;
+  const { cardid } = req.params;
+  const { applicationStatus } = req.query;
+
+  if (!user) {
+    return res.status(401).json({ error: "Unauthorized access." });
+  }
+
+  if (!cardid || !applicationStatus) {
+    return res.status(400).json({ error: "Missing required parameters." });
+  }
+
+  try {
+    const response = await WorkerApplication.updateOne(
+      { _id: cardid },
+      { $set: { status: applicationStatus } }
+    );
+
+    const application = await WorkerApplication.findOne({
+      _id: cardid,
+    });
+
+    if (response.modifiedCount === 0) {
+      return res
+        .status(404)
+        .json({ error: "Application not found or already updated." });
+    }
+
+    if (applicationStatus === "accepted") {
+      const existingConversation = await conversationModel.findOne({
+        participants: { $all: [user._id, application.worker_id] },
+      });
+
+      if (!existingConversation) {
+        await conversationModel.create({
+          participants: [user._id, application.worker_id],
+          messages: [],
+        });
+      }
+    }
+
+    res.status(200).json({
+      message: `Application ${applicationStatus}ed successfully.`,
+      data: response,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Internal server error.", details: error.message });
   }
 };
