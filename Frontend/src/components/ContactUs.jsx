@@ -327,7 +327,11 @@ const ContactUs = () => {
           {/* This would be your actual map integration */}
           <div className="w-full h-full flex items-center justify-center bg-gray-200">
             <p className="text-gray-500">
-              Interactive Map Would Be Integrated Here
+              <img
+                src="https://assets.grok.com/users/3e79c159-6fe1-439b-acfc-5ea6749666b9/generated/8Z4mYbTptThW4i95/image.jpg"
+                alt=""
+                className="w-full h-full object-contain"
+              />
             </p>
           </div>
         </motion.div>

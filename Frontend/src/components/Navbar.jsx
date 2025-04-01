@@ -100,10 +100,7 @@ function Navbar() {
           ) : user?.user?.role === "user" ? (
             <NavLink to="/post-work">Something Broken ?</NavLink>
           ) : (
-            <NavLink
-              to="/worker-register"
-              className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-medium"
-            >
+            <NavLink to="/worker-register" className="text-black font-medium">
               Register as Worker
             </NavLink>
           )}

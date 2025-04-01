@@ -87,8 +87,6 @@ module.exports.getMessages = async (req, res) => {
 };
 
 module.exports.getAllConversation = async (req, res) => {
-  console.log("✅ getAllConversation function called!"); // Debugging line
-
   try {
     const user = req.user; // Ensure user is available
     if (!user || !user._id) {
@@ -97,9 +95,10 @@ module.exports.getAllConversation = async (req, res) => {
 
     const allConversations = await conversationModel
       .find({ participants: user._id })
-      .populate({ path: "messages", populate: { path: "receiver_id" } });
-
-    console.log("✅ Conversations found:", allConversations.length);
+      .populate({
+        path: "messages",
+        populate: { path: "receiver_id", select: "fullname profession" },
+      });
 
     res.status(200).json(allConversations);
   } catch (error) {

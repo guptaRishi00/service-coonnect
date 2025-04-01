@@ -44,8 +44,13 @@ function UserLogin() {
         dispatch(loginSuccess({ token: response.data.token }));
         await dispatch(fetchUser());
 
+        if (data.user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/home");
+        }
+
         console.log("User Logged in Successfully", data);
-        navigate("/home");
       }
 
       setEmail("");

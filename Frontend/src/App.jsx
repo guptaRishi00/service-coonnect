@@ -15,6 +15,7 @@ import SearchWork from "./pages/worker/SearchWork";
 import Profile from "./pages/Profile";
 import Notification from "./pages/user/Notification";
 import Chat from "./pages/Chat";
+import Admin from "./pages/Admin";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="/book-now" element={<BookNow />} />
         <Route path="/post-work" element={<PostWork />} />
         <Route path="/chat" element={<Chat />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<Home />} />
       </Routes>
     </>

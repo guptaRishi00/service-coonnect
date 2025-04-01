@@ -6,12 +6,12 @@ const messageController = require("../controllers/message.controller");
 
 router.post("/send/:id", userAuthMiddleWare, messageController.sendMessage);
 
-router.get("/:id", userAuthMiddleWare, messageController.getMessages);
-
 router.get(
   "/conversations",
   userAuthMiddleWare,
   messageController.getAllConversation
 );
+
+router.get("/:id", userAuthMiddleWare, messageController.getMessages);
 
 module.exports = router;

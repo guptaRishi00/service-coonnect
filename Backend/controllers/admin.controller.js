@@ -1,10 +1,6 @@
-const express = require("express");
-const router = express.Router();
-const { userAuthMiddleware } = require("../middleware/userAuthMiddleWare");
-const adminController = require("../controllers/admin.controller");
 const userModel = require("../models/user.model");
 
-router.get("/getusers", userAuthMiddleware, async (req, res) => {
+module.exports.getUsers = async (req, res) => {
   try {
     const response = await userModel.find({});
 
@@ -19,6 +15,4 @@ router.get("/getusers", userAuthMiddleware, async (req, res) => {
       message: error.message || "Internal Server Error",
     });
   }
-});
-
-module.exports = router;
+};

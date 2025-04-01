@@ -19,9 +19,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.use("/serviceconnect/admin", adminRoute);
 app.use("/serviceconnect/user", userRoute);
 app.use("/serviceconnect/worker", workerRoute);
-app.use("/serviceconnect/admin", adminRoute);
 app.use("/serviceconnect/message", messageRoute);
 
 module.exports = app;
