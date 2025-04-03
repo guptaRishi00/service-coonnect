@@ -1,190 +1,211 @@
-import React, { useState, useEffect } from "react";
-import { PlusCircle, MoreVertical, Search, ArrowLeft } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import ChatWindow from "./ChatWindow"; // Import the ChatWindow component
+import { fetchConversations } from "../features/message/messageSlice";
+import { AnimatePresence, motion } from "framer-motion";
+import { MdArrowOutward, MdSearch } from "react-icons/md";
+import { IoIosArrowRoundForward } from "react-icons/io";
+import { LuBell } from "react-icons/lu";
+import ChatWindow from "./ChatWindow";
 
 function Chat() {
-  const [selectedContact, setSelectedContact] = useState(null);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(true);
-  const [conversation, setConversation] = useState([]);
-
-  // Handle mobile view transitions
-  useEffect(() => {
-    if (selectedContact && window.innerWidth < 768) {
-      setMobileSidebarOpen(false);
-    }
-  }, [selectedContact]);
-
-  const toggleMobileSidebar = () => {
-    setMobileSidebarOpen(!mobileSidebarOpen);
-  };
-
-  const backToContactList = () => {
-    setMobileSidebarOpen(true);
-  };
-
-  // Status badge component for consistent styling
-  const StatusBadge = ({ status }) => {
-    const colors = {
-      online: "bg-emerald-500",
-      away: "bg-yellow-500",
-      offline: "bg-gray-400",
-    };
-
-    return (
-      <span
-        className={`absolute bottom-0 right-0 block h-3 w-3 rounded-full ${colors[status]} ring-2 ring-white`}
-      />
-    );
-  };
-
   const dispatch = useDispatch();
+  const { conversations, loading } = useSelector((state) => state.message);
+  const [activeReceiver, setActiveReceiver] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    const fetchConversation = async () => {
-      const token = localStorage.getItem("token");
-      try {
-        const conversations = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}/message/conversations`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+    dispatch(fetchConversations());
+  }, [dispatch]);
 
-        setConversation(conversations.data);
-      } catch (error) {
-        console.log("error:", error.message);
-      }
-    };
-    fetchConversation();
+  const handleSelectConversation = (participantId) => {
+    setActiveReceiver(participantId);
+  };
+
+  // Current date formatter for header
+  const currentDate = useMemo(() => {
+    return new Date().toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
   }, []);
 
-  return (
-    <div className="flex h-[calc(100vh-6rem)] bg-white overflow-hidden">
-      {/* Mobile Sidebar Toggle Button (visible when chat is open) */}
-      {!mobileSidebarOpen && selectedContact && (
-        <button
-          onClick={backToContactList}
-          className="md:hidden absolute top-4 left-4 z-10 p-2 bg-white rounded-full shadow-md text-gray-600 hover:bg-gray-50"
-        >
-          <ArrowLeft size={20} />
-        </button>
-      )}
+  // Filter conversations based on search query
+  const filteredConversations = useMemo(() => {
+    if (!searchQuery.trim() || !conversations) return conversations;
 
-      {/* Sidebar */}
-      <AnimatePresence mode="wait">
-        {(mobileSidebarOpen || window.innerWidth >= 768) && (
-          <motion.div
-            className="w-full md:w-80 bg-neutral-50 border-r border-neutral-200 flex flex-col md:relative absolute inset-0 z-10"
-            initial={{ x: -280, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -280, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          >
-            {/* Search */}
-            <div className="p-4">
+    return conversations.filter((conversation) =>
+      conversation.participants?.some((participant) =>
+        participant.fullname?.firstname
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase())
+      )
+    );
+  }, [conversations, searchQuery]);
+
+  return (
+    <div className="w-full h-[calc(100vh-4rem)]">
+      {" "}
+      {/* Adjusted height */}
+      <div className="flex flex-col h-full">
+        {/* Messages header */}
+
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left sidebar */}
+          <div className="w-full md:w-1/3 lg:w-1/4 border-r border-gray-100 flex flex-col">
+            {/* Search bar */}
+            <div className="px-4 py-2">
               <div className="relative">
+                <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search conversations"
-                  className="w-full p-2.5 pl-9 text-sm bg-white border border-neutral-200 rounded-lg 
-                            focus:ring-2 focus:ring-[#FF8057] focus:border-transparent focus:outline-none
-                            transition-all duration-200"
-                />
-                <Search
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
+                  placeholder="Search conversations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-gray-50 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8057] transition-all"
                 />
               </div>
             </div>
 
-            {/* Contact List */}
-            <div className="flex-1 overflow-y-auto">
-              {conversation.map((contact) => (
-                <motion.div
-                  key={contact._id}
-                  className={`
-                    p-3 flex items-center cursor-pointer 
-                    hover:bg-neutral-100 transition-colors group
-                    ${
-                      selectedContact?._id === contact._id
-                        ? "bg-[#FF8057]/5 border-l-2 border-[#FF8057]"
-                        : contact.pinned
-                        ? "border-l-2 border-blue-400"
-                        : ""
-                    }
-                  `}
-                  onClick={() => {
-                    setSelectedContact(contact);
-                    if (window.innerWidth < 768) {
-                      setMobileSidebarOpen(false);
-                    }
-                  }}
-                  whileHover={{ x: 5 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  <div className="relative mr-3">
-                    <img
-                      src="https://cdn.midjourney.com/6a1ea943-3d3c-4aac-9ab9-77d3193b6cba/0_0.png"
-                      alt={contact.name}
-                      className={`
-                        w-12 h-12 rounded-full shadow-sm
-                        ${
-                          selectedContact?._id === contact._id
-                            ? "ring-2 ring-[#FF8057]"
-                            : ""
-                        }
-                      `}
-                    />
-                    <StatusBadge status={contact.status || "offline"} />
-                    {contact.unreadCount > 0 && (
-                      <span
-                        className="absolute -top-1 -right-1 bg-red-500 text-white text-xs 
-                          rounded-full h-5 w-5 flex items-center justify-center
-                          border-2 border-white font-medium"
-                      >
-                        {contact.unreadCount}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex-1 overflow-hidden">
-                    <div className="flex justify-between items-center">
-                      <h3
-                        className={`font-medium ${
-                          selectedContact?._id === contact._id
-                            ? "text-[#FF8057]"
-                            : "text-neutral-800"
-                        } truncate`}
-                      >
-                        {contact.messages?.length > 0 &&
-                        contact.messages[0]?.receiver_id
-                          ? contact.messages[0].receiver_id.fullname.firstname
-                          : "Unknown"}
-                      </h3>
-                      <span className="text-xs text-neutral-500 opacity-70 group-hover:opacity-100 transition-opacity">
-                        {contact.lastMessageTime || "10:45 AM"}
-                      </span>
+            {/* Conversation list with height adjustment */}
+            <div className="flex-1 overflow-y-auto max-h-[calc(100vh-10rem)]">
+              <AnimatePresence>
+                {loading ? (
+                  <div className="flex justify-center items-center h-full">
+                    <div className="animate-pulse flex flex-col space-y-4 w-full px-4 py-8">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="flex items-center space-x-3">
+                          <div className="rounded-full bg-gray-200 h-10 w-10"></div>
+                          <div className="flex-1">
+                            <div className="h-3 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div className="h-2 bg-gray-200 rounded w-1/2"></div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <p className="text-xs text-neutral-500 truncate">
-                      {contact.lastMessage || "No messages yet"}
+                  </div>
+                ) : filteredConversations?.length === 0 ? (
+                  <div className="p-6 text-center">
+                    <p className="text-gray-500 text-sm">
+                      No conversations found
                     </p>
                   </div>
-                </motion.div>
-              ))}
+                ) : (
+                  filteredConversations?.map((conversation) => (
+                    <motion.div
+                      key={conversation._id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="border-b border-gray-100 last:border-none"
+                    >
+                      {conversation?.participants?.map((participant) => {
+                        const isActive = activeReceiver === participant._id;
+                        const firstName =
+                          participant.fullname?.firstname || "Unknown";
+                        const initial = firstName
+                          ? firstName.charAt(0).toUpperCase()
+                          : "?";
+
+                        return (
+                          <div
+                            key={participant._id}
+                            onClick={() =>
+                              handleSelectConversation(participant._id)
+                            }
+                            className={`p-4 cursor-pointer group transition-all duration-300 ${
+                              isActive ? "bg-gray-50" : "hover:bg-gray-50"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="relative">
+                                <div
+                                  className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                                    isActive
+                                      ? "bg-[#FF8057] text-white"
+                                      : "bg-gray-100 text-gray-700 group-hover:bg-[#FF8057]/10 group-hover:text-[#FF8057]"
+                                  } transition-all duration-300 text-lg font-medium`}
+                                >
+                                  {initial}
+                                </div>
+                                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex justify-between items-center mb-1">
+                                  <p
+                                    className={`font-medium ${
+                                      isActive
+                                        ? "text-[#FF8057]"
+                                        : "text-gray-800"
+                                    }`}
+                                  >
+                                    {firstName}
+                                  </p>
+                                  <p className="text-xs text-gray-400">
+                                    2m ago
+                                  </p>
+                                </div>
+                                <p className="text-sm text-gray-500 truncate">
+                                  {conversation.lastMessage ||
+                                    "Start a conversation..."}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </motion.div>
+                  ))
+                )}
+              </AnimatePresence>
             </div>
+          </div>
+
+          {/* Right chat window */}
+          <div className="hidden md:block md:w-2/3 lg:w-3/4">
+            {activeReceiver ? (
+              <ChatWindow receiver={activeReceiver} />
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-r from-[#FF8057] to-pink-500 flex items-center justify-center mb-6 shadow-lg">
+                  <MdArrowOutward className="text-3xl text-white" />
+                </div>
+                <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-[#FF8057] to-pink-500 bg-clip-text text-transparent">
+                  Your Messages
+                </h2>
+                <p className="text-gray-500 mb-6 max-w-md">
+                  Select a conversation from the list to start chatting or
+                  create a new message
+                </p>
+                <button className="flex items-center gap-2 bg-black text-white px-6 py-3 rounded-full group hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg">
+                  <span>New Message</span>
+                  <IoIosArrowRoundForward className="text-xl transition-transform duration-300 group-hover:translate-x-1" />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      {/* Mobile view when a chat is selected */}
+      <AnimatePresence>
+        {activeReceiver && (
+          <motion.div
+            className="md:hidden fixed inset-0 bg-white z-50 mt-16"
+            style={{ height: "calc(100% - 4rem)" }}
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+          >
+            <ChatWindow
+              receiver={activeReceiver}
+              onBack={() => setActiveReceiver(null)}
+              isMobile={true}
+            />
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Chat Window Component */}
-      <ChatWindow
-        selectedContact={selectedContact}
-        toggleMobileSidebar={toggleMobileSidebar}
-      />
     </div>
   );
 }

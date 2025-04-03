@@ -1,6 +1,7 @@
 const { mongoose } = require("mongoose");
 const conversationModel = require("../models/conversation.model");
 const messageModel = require("../models/message.model");
+const userModel = require("../models/user.model");
 
 module.exports.sendMessage = async (req, res) => {
   const user = req.user;
@@ -69,18 +70,13 @@ module.exports.getMessages = async (req, res) => {
       .findOne({
         participants: { $all: [senderId, receiverId] },
       })
-      .populate({
-        path: "messages",
-        populate: {
-          path: "receiver_id",
-        },
-      });
+      .populate("messages");
 
     if (!conversations || conversations.length === 0) {
       return res.status(200).json([]);
     }
 
-    res.status(200).json(conversations);
+    res.status(200).json(conversations.messages);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -98,6 +94,10 @@ module.exports.getAllConversation = async (req, res) => {
       .populate({
         path: "messages",
         populate: { path: "receiver_id", select: "fullname profession" },
+      })
+      .populate({
+        path: "participants",
+        match: { _id: { $ne: user._id } },
       });
 
     res.status(200).json(allConversations);

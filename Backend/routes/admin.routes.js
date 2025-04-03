@@ -1,24 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const { userAuthMiddleware } = require("../middleware/userAuthMiddleWare");
 const adminController = require("../controllers/admin.controller");
-const userModel = require("../models/user.model");
 
-router.get("/getusers", userAuthMiddleware, async (req, res) => {
-  try {
-    const response = await userModel.find({});
+// Dashboard statistics
+router.get("/stats", adminController.getDashboardStats);
 
-    if (!response) {
-      throw new Error("Something went wrong");
-    }
+// User management
+router.get("/users", adminController.getUsers);
+router.patch("/users/:userId/status", adminController.updateUserStatus);
 
-    res.status(200).json(response);
-  } catch (error) {
-    res.status(500).json({
-      error: true,
-      message: error.message || "Internal Server Error",
-    });
-  }
-});
+// Work post management
+router.get("/workposts", adminController.getWorkPosts);
+router.patch("/workposts/:postId/status", adminController.updateWorkPostStatus);
 
 module.exports = router;
