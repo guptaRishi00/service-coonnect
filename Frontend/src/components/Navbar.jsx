@@ -80,20 +80,22 @@ function Navbar() {
             </>
           ) : (
             <>
-              <NavLink to="#">Services</NavLink>
+              <NavLink to="/service-details">Services</NavLink>
             </>
           )}
 
           {/* Gradient text with better animation */}
-          <div className="relative flex items-center cursor-pointer group">
-            <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent text-sm font-medium">
-              Guides
-            </span>
-            <MdArrowOutward
-              className="text-xs ml-1 mb-1 transition-all duration-300 
+          <NavLink to={"/guides"}>
+            <div className="relative flex items-center cursor-pointer group">
+              <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent text-sm font-medium">
+                Guides
+              </span>
+              <MdArrowOutward
+                className="text-xs ml-1 mb-1 transition-all duration-300 
                                       group-hover:translate-x-1 group-hover:translate-y-[-2px] text-gray-600"
-            />
-          </div>
+              />
+            </div>
+          </NavLink>
 
           {user?.user?.role === "worker" ? (
             <NavLink to="/worker-searchwork">Search work</NavLink>
@@ -108,7 +110,7 @@ function Navbar() {
           {user ? (
             <NavLink to="/chat">Chat</NavLink>
           ) : (
-            <NavLink to="#">About</NavLink>
+            <NavLink to="/about-us">About</NavLink>
           )}
         </div>
 

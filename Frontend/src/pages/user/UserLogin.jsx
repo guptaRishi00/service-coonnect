@@ -12,12 +12,45 @@ function UserLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [loginError, setLoginError] = useState("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const validateForm = () => {
+    let tempErrors = {};
+    let isValid = true;
+
+    // Email validation
+    if (!email) {
+      tempErrors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      tempErrors.email = "Email is invalid";
+      isValid = false;
+    }
+
+    // Password validation
+    if (!password) {
+      tempErrors.password = "Password is required";
+      isValid = false;
+    }
+
+    setErrors(tempErrors);
+    return isValid;
+  };
+
   const submitHandler = async (e) => {
     e.preventDefault();
+
+    // Clear previous errors
+    setLoginError("");
+
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
 
     // Set loading state to true when login starts
     setIsLoading(true);
@@ -57,7 +90,29 @@ function UserLogin() {
       setPassword("");
     } catch (error) {
       console.error("Error logging in", error);
-      // Optional: Add error handling, perhaps set an error state
+
+      // Handle different error scenarios
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        if (error.response.status === 404) {
+          setLoginError("Email not found. Please check your email or sign up.");
+        } else if (error.response.status === 401) {
+          setLoginError("Incorrect email or password. Please try again.");
+        } else if (error.response.data && error.response.data.message) {
+          setLoginError(error.response.data.message);
+        } else {
+          setLoginError("Login failed. Please try again later.");
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        setLoginError(
+          "Network error. Please check your connection and try again."
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setLoginError("An unexpected error occurred. Please try again.");
+      }
     } finally {
       // Always set loading state back to false
       setIsLoading(false);
@@ -81,17 +136,40 @@ function UserLogin() {
           </p>
         </div>
 
+        {/* Display login error message */}
+        {loginError && (
+          <div
+            className="w-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+            role="alert"
+          >
+            <span className="block sm:inline">{loginError}</span>
+          </div>
+        )}
+
         <form className="w-full flex flex-col gap-5">
           {/* Email Input */}
           <div className="flex flex-col gap-2">
             <p className="text-md font-medium">Email*</p>
             <input
               type="email"
-              className="border border-gray-300 rounded-md px-4 py-3 outline-none focus:ring-2 focus:ring-[#FFBE98]"
+              className={`border ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              } rounded-md px-4 py-3 outline-none focus:ring-2 focus:ring-[#FFBE98]`}
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) {
+                  setErrors({ ...errors, email: "" });
+                }
+                if (loginError) {
+                  setLoginError("");
+                }
+              }}
               disabled={isLoading}
             />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+            )}
           </div>
 
           {/* Password Input */}
@@ -99,11 +177,34 @@ function UserLogin() {
             <p className="text-md font-medium">Password*</p>
             <input
               type="password"
-              className="border border-gray-300 rounded-md px-4 py-3 outline-none focus:ring-2 focus:ring-[#FFBE98]"
+              className={`border ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              } rounded-md px-4 py-3 outline-none focus:ring-2 focus:ring-[#FFBE98]`}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errors.password) {
+                  setErrors({ ...errors, password: "" });
+                }
+                if (loginError) {
+                  setLoginError("");
+                }
+              }}
               disabled={isLoading}
             />
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
+          </div>
+
+          {/* Forgot Password Link */}
+          <div className="flex justify-end">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-blue-500 hover:underline"
+            >
+              Forgot password?
+            </Link>
           </div>
 
           {/* Login Button */}

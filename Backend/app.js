@@ -12,6 +12,7 @@ const userRoute = require("./routes/user.routes");
 const workerRoute = require("./routes/worker.routes");
 const adminRoute = require("./routes/admin.routes");
 const messageRoute = require("./routes/message.routes");
+const aiRoute = require("./routes/ai.routes");
 
 app.use(cors({ origin: "*", credentials: true }));
 app.options("*", cors());
@@ -23,5 +24,6 @@ app.use("/serviceconnect/admin", adminRoute);
 app.use("/serviceconnect/user", userRoute);
 app.use("/serviceconnect/worker", workerRoute);
 app.use("/serviceconnect/message", messageRoute);
+app.use("/serviceconnect/ai", aiRoute);
 
 module.exports = app;
