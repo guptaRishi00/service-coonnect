@@ -59,6 +59,10 @@ const userSchema = new Schema({
   socketId: {
     type: String,
   },
+  verified: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

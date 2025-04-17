@@ -18,6 +18,7 @@ import Admin from "./pages/Admin";
 import AboutUs from "./components/AboutUs";
 import ServiceDetails from "./pages/ServiceDetails";
 import AiAssistant from "./pages/AiAssistant";
+import PaymentPage from "./pages/PaymentPage";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
         <Route path="/guides" element={<AiAssistant />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/payment/:name" element={<PaymentPage />} />
         <Route path="*" element={<Home />} />
       </Routes>
     </>

@@ -182,8 +182,11 @@ function Navbar() {
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>
                 </div>
                 <div>
-                  <p className="font-medium text-sm group-hover:text-[#FF8057] transition-colors">
+                  <p className="font-medium text-sm group-hover:text-[#FF8057] transition-colors flex gap-2">
                     Hey! {user?.user?.fullname?.firstname}
+                    <span className="text-[8px] text-blue-500 font-normal">
+                      {user?.user?.verified ? "verified" : ""}
+                    </span>
                   </p>
                   <p className="text-[8px] text-gray-700">{currentDate}</p>
                 </div>

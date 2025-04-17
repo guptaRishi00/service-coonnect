@@ -27,23 +27,12 @@ const getWorkPosts = async (req, res) => {
   }
 };
 
-const updateUserStatus = async (req, res) => {
+const getWorkers = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const { role } = req.body;
-
-    const user = await userModel
-      .findByIdAndUpdate(userId, { role }, { new: true })
+    const response = await userModel
+      .find({ role: "worker" })
       .select("-password");
-
-    if (!user) {
-      return res.status(404).json({
-        error: true,
-        message: "User not found",
-      });
-    }
-
-    res.status(200).json(user);
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({
       error: true,
@@ -51,51 +40,13 @@ const updateUserStatus = async (req, res) => {
     });
   }
 };
-
-const updateWorkPostStatus = async (req, res) => {
+const getWorkPost = async (req, res) => {
   try {
-    const { postId } = req.params;
-    const { status } = req.body;
-
-    const post = await workPostModel
-      .findByIdAndUpdate(postId, { status }, { new: true })
-      .populate("user", "fullname email");
-
-    if (!post) {
-      return res.status(404).json({
-        error: true,
-        message: "Work post not found",
-      });
-    }
-
-    res.status(200).json(post);
-  } catch (error) {
-    res.status(500).json({
-      error: true,
-      message: error.message || "Internal Server Error",
-    });
-  }
-};
-
-const getDashboardStats = async (req, res) => {
-  try {
-    const totalUsers = await userModel.countDocuments();
-    const totalWorkers = await userModel.countDocuments({ role: "worker" });
-    const totalPosts = await workPostModel.countDocuments();
-    const pendingPosts = await workPostModel.countDocuments({
-      status: "pending",
-    });
-    const activePosts = await workPostModel.countDocuments({
-      status: "accept",
-    });
-
-    res.status(200).json({
-      totalUsers,
-      totalWorkers,
-      totalPosts,
-      pendingPosts,
-      activePosts,
-    });
+    const response = await workPostModel
+      .find({})
+      .select("-password")
+      .populate("user");
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({
       error: true,
@@ -107,7 +58,6 @@ const getDashboardStats = async (req, res) => {
 module.exports = {
   getUsers,
   getWorkPosts,
-  updateUserStatus,
-  updateWorkPostStatus,
-  getDashboardStats,
+  getWorkers,
+  getWorkPost,
 };

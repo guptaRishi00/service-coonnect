@@ -11,14 +11,16 @@ function Chat() {
   const dispatch = useDispatch();
   const { conversations, loading } = useSelector((state) => state.message);
   const [activeReceiver, setActiveReceiver] = useState(null);
+  const [name, setName] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     dispatch(fetchConversations());
   }, [dispatch]);
 
-  const handleSelectConversation = (participantId) => {
+  const handleSelectConversation = (participantId, name) => {
     setActiveReceiver(participantId);
+    setName(name);
   };
 
   // Current date formatter for header
@@ -45,7 +47,7 @@ function Chat() {
   }, [conversations, searchQuery]);
 
   return (
-    <div className="w-full h-[calc(100vh-4rem)]">
+    <div className="w-full h-[640px] ">
       {" "}
       {/* Adjusted height */}
       <div className="flex flex-col h-full">
@@ -112,7 +114,10 @@ function Chat() {
                           <div
                             key={participant._id}
                             onClick={() =>
-                              handleSelectConversation(participant._id)
+                              handleSelectConversation(
+                                participant._id,
+                                participant.fullname?.firstname
+                              )
                             }
                             className={`p-4 cursor-pointer group transition-all duration-300 ${
                               isActive ? "bg-gray-50" : "hover:bg-gray-50"
@@ -165,7 +170,7 @@ function Chat() {
           {/* Right chat window */}
           <div className="hidden md:block md:w-2/3 lg:w-3/4">
             {activeReceiver ? (
-              <ChatWindow receiver={activeReceiver} />
+              <ChatWindow receiver={activeReceiver} name={name} />
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-center px-4">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-r from-[#FF8057] to-pink-500 flex items-center justify-center mb-6 shadow-lg">
@@ -202,6 +207,7 @@ function Chat() {
               receiver={activeReceiver}
               onBack={() => setActiveReceiver(null)}
               isMobile={true}
+              name={name}
             />
           </motion.div>
         )}

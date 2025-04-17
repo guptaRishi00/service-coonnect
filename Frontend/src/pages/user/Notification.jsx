@@ -8,12 +8,16 @@ import {
   UserCircle2,
   Bell,
   ImageIcon,
+  Link,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const NotificationCard = ({ notification, onRefresh, onChatNavigate }) => {
   const [status, setStatus] = useState(notification.status || "pending");
   const [isProcessing, setIsProcessing] = useState(false);
   const token = localStorage.getItem("token");
+
+  const navigate = useNavigate();
 
   const handleAction = async (actionType) => {
     setIsProcessing(true);
@@ -118,16 +122,11 @@ const NotificationCard = ({ notification, onRefresh, onChatNavigate }) => {
               <motion.button
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                onClick={() =>
-                  onChatNavigate({
-                    userId: notification.worker_id?._id,
-                    userName: notification.worker_id?.fullname?.firstname,
-                  })
-                }
-                className="w-10 h-10 bg-green-500 text-white rounded-full 
-                         flex items-center justify-center 
-                         hover:bg-green-600 
-                         transition-all"
+                onClick={() => navigate("/chat")}
+                className="w-10 h-10 bg-green-500 text-white rounded-full
+                  flex items-center justify-center
+                  hover:bg-green-600
+                  transition-all"
               >
                 <MessageCircle className="w-5 h-5" />
               </motion.button>
@@ -143,11 +142,11 @@ const NotificationCard = ({ notification, onRefresh, onChatNavigate }) => {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleAction("accepted")}
                   disabled={isProcessing}
-                  className="w-10 h-10 bg-green-500 text-white rounded-full 
-                         flex items-center justify-center 
-                         hover:bg-green-600 
-                         transition-all
-                         disabled:opacity-50"
+                  className="w-10 h-10 bg-green-500 text-white rounded-full
+                    flex items-center justify-center
+                    hover:bg-green-600
+                    transition-all
+                    disabled:opacity-50"
                 >
                   <CheckCircle className="w-5 h-5" />
                 </motion.button>
@@ -157,11 +156,11 @@ const NotificationCard = ({ notification, onRefresh, onChatNavigate }) => {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleAction("rejected")}
                   disabled={isProcessing}
-                  className="w-10 h-10 bg-red-500 text-white rounded-full 
-                         flex items-center justify-center 
-                         hover:bg-red-600 
-                         transition-all
-                         disabled:opacity-50"
+                  className="w-10 h-10 bg-red-500 text-white rounded-full
+                    flex items-center justify-center
+                    hover:bg-red-600
+                    transition-all
+                    disabled:opacity-50"
                 >
                   <XCircle className="w-5 h-5" />
                 </motion.button>

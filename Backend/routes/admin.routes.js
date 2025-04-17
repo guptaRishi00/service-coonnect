@@ -1,16 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/admin.controller");
-
-// Dashboard statistics
-router.get("/stats", adminController.getDashboardStats);
+const { userAuthMiddleWare } = require("../middleware/userAuthMiddleWare");
 
 // User management
-router.get("/users", adminController.getUsers);
-router.patch("/users/:userId/status", adminController.updateUserStatus);
-
-// Work post management
-router.get("/workposts", adminController.getWorkPosts);
-router.patch("/workposts/:postId/status", adminController.updateWorkPostStatus);
+router.get("/users", userAuthMiddleWare, adminController.getUsers);
+router.get("/workers", userAuthMiddleWare, adminController.getWorkers);
+router.get("/workpost", userAuthMiddleWare, adminController.getWorkPost);
 
 module.exports = router;

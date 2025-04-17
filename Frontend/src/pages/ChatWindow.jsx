@@ -1,4 +1,3 @@
-// ChatWindow.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMessage, sendMessage } from "../features/message/messageSlice";
@@ -9,22 +8,31 @@ import {
   HiOutlinePaperClip,
   HiOutlinePhotograph,
 } from "react-icons/hi";
+import { Link } from "react-router-dom";
 
-function ChatWindow({ receiver, onBack, isMobile = false }) {
+function ChatWindow({ receiver, onBack, isMobile = false, name }) {
   const dispatch = useDispatch();
   const [text, setText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
+  const [workerName, setWorkerName] = useState(null);
+
   // Get messages from Redux state
   const messages = useSelector((state) => state.message.messages);
   const currentUser = useSelector((state) => state.authUser);
   const typingTimeoutRef = useRef(null);
 
+  const user = useSelector((state) => state.userAuth.user.user);
+
   useEffect(() => {
     if (receiver) {
       dispatch(fetchMessage(receiver));
+    }
+
+    if (receiver.name) {
+      setWorkerName(name);
     }
 
     // Focus input on mount
@@ -94,6 +102,34 @@ function ChatWindow({ receiver, onBack, isMobile = false }) {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
+  // Determine message style based on role
+  const getMessageStyle = (msg) => {
+    // Check if the message is from the current user
+    const isMine = msg.sender === currentUser?._id;
+
+    // Determine colors based on role and sender
+    if (isMine) {
+      // Current user is sending
+      return user.role === "user"
+        ? "bg-[#55ACEE] text-white rounded-br-none" // Blue for user messages (Snapchat-like)
+        : "bg-[#FF8057] text-white rounded-br-none"; // Orange for worker messages
+    } else {
+      // Receiving messages
+      return msg.senderRole === "user"
+        ? "bg-[#55ACEE] text-white rounded-bl-none" // Blue for messages from users
+        : "bg-[#FF8057] text-white rounded-bl-none"; // Orange for messages from workers
+    }
+  };
+
+  // Get avatar text/color based on role
+  const getAvatarStyle = (msg) => {
+    return msg.senderRole === "user"
+      ? { text: "U", bgColor: "bg-[#55ACEE]" }
+      : { text: "W", bgColor: "bg-[#FF8057]" };
+  };
+
+  console.log("chat window", name);
+
   return (
     <div className="flex flex-col h-full">
       {/* Chat header */}
@@ -109,17 +145,36 @@ function ChatWindow({ receiver, onBack, isMobile = false }) {
           )}
 
           <div className="relative">
-            <div className="w-10 h-10 rounded-full bg-[#FF8057] text-white flex items-center justify-center">
-              <span>R</span>
+            <div
+              className={`w-10 h-10 rounded-full ${
+                receiver?.role === "user" ? "bg-[#55ACEE]" : "bg-[#FF8057]"
+              } text-white flex items-center justify-center`}
+            >
+              <span>{receiver?.role === "user" ? "U" : "W"}</span>
             </div>
             <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
           </div>
 
           <div className="flex-1">
             <div className="flex justify-between items-center">
-              <h2 className="font-medium">Recipient Name</h2>
+              <h2 className="font-medium">{name || "Recipient Name"}</h2>
               <div className="flex gap-2">
-                {/* Call/Video icons could go here */}
+                <Link
+                  to={`/payment/${name}`}
+                  className="flex items-center gap-1"
+                >
+                  <button className="group relative flex items-center justify-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
+                    {/* Glow effect */}
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-white/0 via-white/10 to-white/0"></span>
+
+                    {/* Animate on hover */}
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transform group-hover:translate-x-full transition-all duration-700 ease-in-out"></span>
+
+                    {/* Content */}
+                    <span className="text-xs font-semibold">₹</span>
+                    <span className="font-medium">Pay</span>
+                  </button>
+                </Link>
               </div>
             </div>
             <p className="text-xs text-green-500">Online</p>
@@ -146,6 +201,8 @@ function ChatWindow({ receiver, onBack, isMobile = false }) {
                     const isMine = msg.sender === currentUser?._id;
                     const showAvatar =
                       index === 0 || msgs[index - 1]?.sender !== msg.sender;
+                    const messageStyle = getMessageStyle(msg);
+                    const avatar = getAvatarStyle(msg);
 
                     return (
                       <motion.div
@@ -158,28 +215,22 @@ function ChatWindow({ receiver, onBack, isMobile = false }) {
                         } items-end gap-2`}
                       >
                         {!isMine && showAvatar ? (
-                          <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-sm">
-                            R
+                          <div
+                            className={`w-8 h-8 rounded-full ${avatar.bgColor} flex-shrink-0 flex items-center justify-center text-sm text-white`}
+                          >
+                            {avatar.text}
                           </div>
                         ) : !isMine ? (
                           <div className="w-8 flex-shrink-0"></div>
                         ) : null}
 
                         <div
-                          className={`max-w-[75%] rounded-2xl px-4 py-3 ${
-                            isMine
-                              ? "bg-gradient-to-r from-[#FF8057] to-[#FF976C] text-white rounded-br-none"
-                              : "bg-white text-gray-800 rounded-bl-none shadow-sm"
-                          }`}
+                          className={`max-w-[75%] rounded-2xl px-4 py-3 ${messageStyle}`}
                         >
                           <p className="text-sm whitespace-pre-wrap">
                             {msg.message}
                           </p>
-                          <p
-                            className={`text-xs mt-1 text-right ${
-                              isMine ? "text-orange-100" : "text-gray-400"
-                            }`}
-                          >
+                          <p className="text-xs mt-1 text-right text-white/80">
                             {formatTime(msg.createdAt)}
                           </p>
                         </div>
@@ -196,8 +247,14 @@ function ChatWindow({ receiver, onBack, isMobile = false }) {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex justify-start items-end gap-2 mt-2"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-sm">
-                    R
+                  <div
+                    className={`w-8 h-8 rounded-full ${
+                      receiver?.role === "user"
+                        ? "bg-[#55ACEE]"
+                        : "bg-[#FF8057]"
+                    } flex-shrink-0 flex items-center justify-center text-sm text-white`}
+                  >
+                    {receiver?.role === "user" ? "U" : "W"}
                   </div>
                   <div className="bg-white rounded-2xl rounded-bl-none px-4 py-3 shadow-sm">
                     <div className="flex gap-1">
@@ -252,18 +309,18 @@ function ChatWindow({ receiver, onBack, isMobile = false }) {
         </AnimatePresence>
       </div>
 
-      {/* Message input */}
-      <div className="p-4 bg-white border-t border-gray-100">
+      {/* Message input - REDUCED HEIGHT */}
+      <div className="p-2 bg-white border-t border-gray-100">
         <div className="flex items-center gap-2">
-          <div className="flex gap-2">
-            <button className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
-              <HiOutlineEmojiHappy className="text-xl" />
+          <div className="flex gap-1">
+            <button className="p-1 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+              <HiOutlineEmojiHappy className="text-lg" />
             </button>
-            <button className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
-              <HiOutlinePaperClip className="text-xl" />
+            <button className="p-1 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+              <HiOutlinePaperClip className="text-lg" />
             </button>
-            <button className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
-              <HiOutlinePhotograph className="text-xl" />
+            <button className="p-1 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+              <HiOutlinePhotograph className="text-lg" />
             </button>
           </div>
 
@@ -277,20 +334,22 @@ function ChatWindow({ receiver, onBack, isMobile = false }) {
             }}
             onKeyPress={(e) => e.key === "Enter" && handleSend()}
             placeholder="Type a message..."
-            className="flex-grow px-4 py-3 bg-gray-50 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8057] transition-all"
+            className="flex-grow px-3 py-2 bg-gray-50 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8057] transition-all"
           />
 
           <button
             onClick={handleSend}
             disabled={!text.trim()}
-            className={`group flex items-center justify-center w-12 h-12 rounded-full shadow-md transition-all duration-300 ${
+            className={`group flex items-center justify-center w-10 h-10 rounded-full shadow-md transition-all duration-300 ${
               text.trim()
-                ? "bg-[#FF8057] hover:bg-[#ff6a3d]"
+                ? user.role === "user"
+                  ? "bg-[#55ACEE] hover:bg-[#3498DB]"
+                  : "bg-[#FF8057] hover:bg-[#ff6a3d]"
                 : "bg-gray-200 cursor-not-allowed"
             }`}
           >
             <IoIosArrowRoundForward
-              className={`text-2xl transition-transform duration-300 group-hover:translate-x-1 ${
+              className={`text-xl transition-transform duration-300 group-hover:translate-x-1 ${
                 text.trim() ? "text-white" : "text-gray-400"
               }`}
             />
